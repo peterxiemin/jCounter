@@ -15,7 +15,7 @@ public class PersistenceThread extends Thread {
             while(true) {
                 sleep(5000);
                 Util.SerializeCounter(counter);
-                System.out.println("PersistenceThread save counter to " + Util.getFileName() + " count : " + counter);
+                System.out.println("PersistenceThread save counter to " + Util.getFileName());
             }
         }
         catch (InterruptedException e) {

@@ -21,46 +21,56 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class CounterHandler extends AbstractHandler {
     private Counter counter;
     ObjectMapper mapper = new ObjectMapper();
+
     public CounterHandler(Counter counter) {
         this.counter = counter;
     }
+
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        String ret = null;
+        String ret = "";
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
 
         String param = request.getParameter("param");
+        if (param == null) {
+            response.getWriter().println("param is empty");
+            return;
+        }
         RequestParam rp = mapper.readValue(param, RequestParam.class);
+        if (rp == null) {
+            response.getWriter().println("rp is empty");
+            return;
+        }
         switch (rp.getId()) {
             case 1000001:
-                Comment c = (Comment)counter.getBusiById(rp.getId());
+                Comment c = (Comment) counter.getBusiById(rp.getId());
                 if (c == null) c = new Comment();
-                List<String> list = rp.getProp();
-                for (int i=0; i < list.size(); i++) {
-                    String prop = list.get(i);
-                    String firstLetter = prop.substring(0, 1).toUpperCase();
-                    String addFunc = "add" + firstLetter + prop.substring(1);
-                    try {
-                        Method method = c.getClass().getMethod(addFunc, new Class[] {});
-                        method.invoke(c, new Object[] {});
-                        counter.setBusi(rp.getId(), c);
-                        ret = mapper.writeValueAsString(c);
-                        System.out.println("agree : " + c.getAgree() + " disagree : " + c.getDisagree());
-                    } catch (Exception e) {
-                        System.out.println("error: " + e.getMessage());
-                        ret = "error: " + e.getMessage();
-                    }
-                }
+                ret = propExec(c, rp);
                 break;
             default:
                 ret = "no id match";
                 break;
         }
-        if (ret == null) {
-            ret = "err[empty]";
-        }
         response.getWriter().println(ret);
+    }
+
+    private <T> String propExec(T busi, RequestParam rp) {
+        try {
+            List<String> propList = rp.getProp();
+            for (int i = 0; i < propList.size(); i++) {
+                String prop = propList.get(i);
+                String firstLetter = prop.substring(0, 1).toUpperCase();
+                String func = rp.getOp() + firstLetter + prop.substring(1);
+                Method method = busi.getClass().getMethod(func, new Class[]{});
+                method.invoke(busi, new Object[]{});
+            }
+            counter.setBusi(rp.getId(), busi);
+            System.out.println(busi);
+            return mapper.writeValueAsString(busi);
+        } catch (Exception e) {
+            return "propExec error reason[" + e.getMessage() + "]";
+        }
     }
 }

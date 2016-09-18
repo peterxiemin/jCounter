@@ -31,11 +31,11 @@ public class Util {
             fileIn.close();
             return count;
         } catch (IOException i) {
-            i.printStackTrace();
+//            i.printStackTrace();
             return null;
         } catch (ClassNotFoundException c) {
             System.out.println("Counter class not found");
-            c.printStackTrace();
+//            c.printStackTrace();
             return null;
         }
     }

@@ -43,7 +43,11 @@ public class Comment implements Serializable {
         this.agree --;
     }
 
-    public void delDisAgree() {
+    public void delDisagree() {
         this.disagree --;
+    }
+
+    public String toString() {
+        return "agree : " + agree + " disagree : " + disagree;
     }
 }
