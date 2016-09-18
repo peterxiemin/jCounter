@@ -6,7 +6,7 @@ import java.io.*;
  * Created by peter on 2016/9/17.
  */
 public class Util {
-    public static final String fileName = "E://Count.ser";
+    public static final String fileName = "E://Counter.ser";
 
     public static void SerializeCounter(Counter count) {
         try {
